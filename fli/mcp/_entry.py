@@ -13,8 +13,11 @@ def run() -> None:
     """Run the MCP server on STDIO."""
     try:
         from fli.mcp.server import run as _run
-    except ImportError:
-        print("MCP dependencies are not installed.\nInstall them with:  pip install 'flights[mcp]'")
+    except ModuleNotFoundError:
+        print(
+            "MCP dependencies are not installed.\nInstall them with:  pip install 'flights[mcp]'",
+            file=sys.stderr,
+        )
         sys.exit(1)
     _run()
 
@@ -23,7 +26,10 @@ def run_http() -> None:
     """Run the MCP server over HTTP (streamable)."""
     try:
         from fli.mcp.server import run_http as _run_http
-    except ImportError:
-        print("MCP dependencies are not installed.\nInstall them with:  pip install 'flights[mcp]'")
+    except ModuleNotFoundError:
+        print(
+            "MCP dependencies are not installed.\nInstall them with:  pip install 'flights[mcp]'",
+            file=sys.stderr,
+        )
         sys.exit(1)
     _run_http()

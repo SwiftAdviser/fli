@@ -25,5 +25,5 @@ try:
         "run",
         "run_http",
     ]
-except ImportError:
+except ModuleNotFoundError:
     __all__: list[str] = []
