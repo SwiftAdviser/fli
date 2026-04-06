@@ -78,7 +78,7 @@ jobs:
           uv venv /tmp/fli-railway-venv --python 3.12
           . /tmp/fli-railway-venv/bin/activate
           uv sync --active --no-dev --frozen --extra mcp
-          uv run python -c "import fastmcp, fli.mcp.server"
+          python -c "import fastmcp, fli.mcp.server"
 
   test:
     needs: [ lint, railway-build ]
