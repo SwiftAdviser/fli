@@ -645,9 +645,7 @@ def run_http(host: str = "127.0.0.1", port: int = 8000) -> None:
     """Run the MCP server over HTTP (streamable) with static file serving."""
     import uvicorn
     from pathlib import Path
-    from starlette.applications import Starlette
-    from starlette.responses import FileResponse, JSONResponse
-    from starlette.routing import Route, Mount
+    from starlette.responses import FileResponse
 
     env_host = os.getenv("HOST")
     env_port = os.getenv("PORT")
@@ -655,21 +653,19 @@ def run_http(host: str = "127.0.0.1", port: int = 8000) -> None:
     bind_host = env_host if env_host else host
     bind_port = int(env_port) if env_port else port
 
-    # Static icon served at /icon.png
-    icon_path = Path(__file__).parent.parent.parent / "icon.png"
+    # Get the standard MCP Starlette app
+    app = mcp.http_app(transport="streamable-http")
+
+    # Add static icon route before MCP routes
+    icon_path = Path(__file__).parent.parent / "icon.png"
+    if not icon_path.exists():
+        icon_path = Path(__file__).parent.parent.parent / "icon.png"
 
     async def serve_icon(request):
-        if icon_path.exists():
-            return FileResponse(icon_path, media_type="image/png")
-        return JSONResponse({"error": "not found"}, status_code=404)
+        return FileResponse(str(icon_path), media_type="image/png")
 
-    # Build the MCP ASGI app
-    mcp_app = mcp.http_app(transport="streamable-http")
-
-    app = Starlette(routes=[
-        Route("/icon.png", serve_icon),
-        Mount("/", app=mcp_app),
-    ])
+    from starlette.routing import Route
+    app.routes.insert(0, Route("/icon.png", serve_icon))
 
     uvicorn.run(app, host=bind_host, port=bind_port)
 
